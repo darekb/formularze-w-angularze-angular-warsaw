@@ -1,0 +1,792 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+
+    <title>Formularze w Angularze V2</title>
+
+    <meta name="description" content="">
+    <meta name="author" content="Dariusz Biedrzycki">
+
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <link rel="stylesheet" href="css/reveal.min.css">
+    <link rel="stylesheet" href="css/theme/night.css" id="theme">
+
+    <!-- For syntax highlighting -->
+    <link rel="stylesheet" href="lib/css/zenburn.css">
+
+    <!-- If the query includes 'print-pdf', include the PDF print sheet -->
+    <script>
+        if (window.location.search.match(/print-pdf/gi)) {
+            var link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.type = 'text/css';
+            link.href = 'css/print/pdf.css';
+            document.getElementsByTagName('head')[0].appendChild(link);
+        }
+    </script>
+
+    <!--[if lt IE 9]>
+    <script src="lib/js/html5shiv.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+
+<div class="reveal">
+
+    <!-- Any section element inside of this container is displayed as a slide -->
+    <div class="slides">
+        <section>
+            <h1>Formularze w Angularze V2</h1>
+            <h2>2.5 sposobu</h2>
+            <p>
+                <small>Created by <a href="http://3w-media.pl">Dariusz Biedrzycki</a> / kontakt@3wm.pl / Mobiem.pl
+                </small>
+            </p>
+        </section>
+
+        <section>
+            <section>
+                <h2>Stara szkoła</h2>
+            </section>
+            <section>
+                <h2>[()]</h2>
+                <p>Two way data binding</p>
+            </section>
+            <section>
+                <p></p>
+                <pre><code  style="font-size:28px; line-height:34px;">
+    &lt;input
+        type="text"
+        [(ngModel)]="user.login"
+        name="login"
+    /&gt;
+                    </code>
+            </pre>
+                <pre><code class="hljs javascript" style="font-size:28px; line-height:34px;">
+    initData(){
+       this.user = { login:"" };
+    }
+            </code></pre>
+            </section>
+            <section>
+                <pre><code  style="font-size:28px; line-height:34px;">
+    &lt;button
+        (click)="saveData()"
+    /&gt;
+    Register
+    &lt;/button&gt;
+                    </code>
+            </pre>
+                <pre><code class="hljs javascript" style="font-size:28px; line-height:30px;">
+    saveData(){
+       if(this.validateData(this.user)){
+          this.registerApi.save(this.user);
+       }
+    }
+            </code></pre>
+            </section>
+            <section>
+                <pre><code  style="font-size:28px; line-height:34px;">
+    &lt;form
+            (ngSubmit)="saveData()"
+    /&gt;
+       &lt;input
+         type="submit"
+         value="Register"
+       /&gt;
+    &lt;/form&gt;
+                    </code>
+            </pre>
+                <pre><code class="hljs javascript" style="font-size:28px; line-height:30px;">
+    saveData(){
+       if(this.validateData(this.user)){
+          this.registerApi.save(this.user);
+       }
+    }
+            </code></pre>
+            </section>
+            <section>
+                <pre><code  style="font-size:28px; line-height:34px;">
+    &lt;input
+       type="text"
+    /&gt;
+    &lt;p
+       *ngIf="loginError"
+    &gt;{{loginError}} &lt;/p&gt;
+                    </code>
+            </pre>
+            <pre><code class="hljs javascript" style="font-size:28px; line-height:30px;">
+    saveData(){
+       if(this.validateData(this.user)){
+          this.registerApi.save(this.user);
+       } else {
+          this.showErrors();
+       }
+    }
+            </code></pre>
+            </section>
+            <section>
+                <pre><code  style="font-size:28px; line-height:34px;">
+    &lt;input
+       type="text"
+       (ngChange)="validateLogin()"
+    /&gt;
+    &lt;p
+       *ngIf="loginError"
+    &gt;{{loginError}} &lt;/p&gt;
+                    </code>
+            </pre>
+                <pre><code class="hljs javascript" style="font-size:28px; line-height:30px;">
+    validateLogin(){
+    }
+            </code></pre>
+            </section>
+            <section>
+                <p>Old way</p>
+                <div style="display:flex;">
+                    <div style="width:50%;">
+                        <h3>Za</h3>
+                    </div>
+                    <div style="width:50%;">
+                        <h3>Przeciw</h3>
+                    </div>
+                </div>
+                <div style="display:flex;">
+                    <div style="width:50%;">
+                        <p class="fragment">Dowoloność implementacji</p>
+                        <p class="fragment">Two way data binding</p>
+                    </div>
+                    <div style="width:50%;">
+                        <p class="fragment">Zmiana modelu w wielu miejscach</p>
+                        <p class="fragment">Two way data binding</p>
+                    </div>
+                </div>
+            </section>
+        </section>
+        <section>
+            <section>
+                <h2>FormsModule</h2>
+            </section>
+            <section>
+                <p>src/app/app.module.ts</p>
+                <pre><code class="hljs javascript" style="font-size:28px; line-height:30px;">
+    import { FormsModule } from '@angular/forms';
+    @NgModule({
+        imports: [
+           ...
+           FormsModule,
+           ...
+        ],
+        ...
+    })
+    export class AppModule { }
+            </code></pre>
+            </section>
+            <section>
+                <p>src/app/register.component.html</p>
+                <pre><code class="hljs html" style="font-size:24px; line-height:28px;">
+    &lt;form  
+       (onSubmit)="onSubmit(f)" 
+       #f
+    &gt;
+       &lt;input
+          type="text"
+          ngModel
+          name="userLogin"
+       /&gt;
+       &lt;button type="submit"&gt; Register &lt;/button&gt;
+    &lt;/form&gt;
+            </code></pre>
+                <p>src/app/register.component.ts</p>
+                <pre><code class="hljs javascript" style="font-size:24px; line-height:26px;">
+    ...           
+    onSubmit(form) {
+        console.log(form);
+    }
+    ...
+            </code></pre>
+            </section>
+            <section>
+                <p>src/app/register.component.html</p>
+                <pre><code class="hljs html" style="font-size:24px; line-height:28px;">
+    &lt;form  
+       (onSubmit)="onSubmit(f)" 
+       #f
+    &gt;
+            </code></pre>
+                <p>src/app/register.component.ts</p>
+                <pre><code class="hljs javascript" style="font-size:24px; line-height:26px;">
+    ...           
+    onSubmit(form:HTMLFormElement) {
+        console.log(form);
+    }
+    ...
+            </code></pre>
+            </section>
+            <section>
+                <p>src/app/register.component.html</p>
+                <pre><code class="hljs html" style="font-size:24px; line-height:28px;">
+    &lt;form  
+       (onSubmit)="onSubmit(f)" 
+       #f="ngForm"
+    &gt;
+       &lt;input
+          type="text"
+          ngModel
+          name="userLogin"
+       /&gt;
+       &lt;button type="submit"&gt; Register &lt;/button&gt;
+    &lt;/form&gt;
+            </code></pre>
+                <p>src/app/register.component.ts</p>
+                <pre><code class="hljs javascript" style="font-size:24px; line-height:26px;">
+    import {NgForm} from "@angular/forms";
+    ...           
+    onSubmit(form: NgForm) {
+        console.log(form);
+    }
+    ...
+            </code></pre>
+            </section>
+            <section>
+                <pre><code class="hljs javascript" style="font-size:20px; line-height:21px;">
+    {
+        controls: {
+            userLogin: {
+                dirty: false,
+                pristine: true,
+                invalid: false
+                valid: true
+                touched: false
+                untouched: true
+            }
+        }
+        value: {
+            userLogin: "to co wpisaliśmy"
+        },
+        dirty: false...
+    }
+            </code></pre>
+            </section>
+            <section>
+                <p>src/app/register.component.html</p>
+                <pre><code class="hljs html" style="font-size:24px; line-height:28px;">
+    &lt;form  
+       (onSubmit)="onSubmit()" 
+       #f="ngForm"
+    &gt;
+            </code></pre>
+                <p>src/app/register.component.ts</p>
+                <pre><code class="hljs javascript" style="font-size:24px; line-height:26px;">
+    import {Component, ViewChild} from '@angular/core';
+    ...
+    @ViewChild('f') registerForm: NgForm;
+    ...           
+    onSubmit() {
+        console.log(this.registerForm);
+        if(this.registerForm.valid){
+            this.registerApi.save(this.registerForm.value);
+        }
+    }
+    ...
+            </code></pre>
+            </section>
+            <section>
+                <p></p>
+                <div style="display:flex;">
+                    <div style="width:30%;">
+                        <h3>state</h3>
+                    </div>
+                    <div style="width:30%;">
+                        <h3>true</h3>
+                    </div>
+                    <div style="width:30%;">
+                        <h3>false</h3>
+                    </div>
+                </div>
+                <div style="display:flex;">
+                    <div style="width:30%;">
+                        <p>touched</p>
+                    </div>
+                    <div style="width:30%;">
+                        <p>ng-touched</p>
+                    </div>
+                    <div style="width:30%;">
+                        <p>ng-untouched</p>
+                    </div>
+                </div>
+                <div style="display:flex;">
+                    <div style="width:30%;">
+                        <p>dirty</p>
+                    </div>
+                    <div style="width:30%;">
+                        <p>ng-dirty</p>
+                    </div>
+                    <div style="width:30%;">
+                        <p>ng-pristine</p>
+                    </div>
+                </div>
+                <div style="display:flex;">
+                    <div style="width:30%;">
+                        <p>valid</p>
+                    </div>
+                    <div style="width:30%;">
+                        <p>ng-valid</p>
+                    </div>
+                    <div style="width:30%;">
+                        <p>ng-invalid</p>
+                    </div>
+                </div>
+            </section>
+            <section>
+                <p>src/app/register.component.html</p>
+                <pre><code class="hljs html" style="font-size:24px; line-height:28px;">
+    &lt;form (onSubmit)="onSubmit(f)" #f="ngForm"&gt;
+       &lt;input
+          type="text"
+          ngModel
+          name="userLogin"
+          required
+          forbiddenName="bob"
+       /&gt;
+       &lt;button type="submit"&gt; Register &lt;/button&gt;
+    &lt;/form&gt;
+            </code></pre>
+            </section>
+            <section>
+                <p>Wbudowane walidatory</p>
+                <pre><code class="hljs html" style="font-size:24px; line-height:28px;">
+class Validators {
+  static min(min: number): ValidatorFn
+  static max(max: number): ValidatorFn
+  static required(control: AbstractControl): ValidationErrors|null
+  static requiredTrue(control: AbstractControl): ValidationErrors|null
+  static email(control: AbstractControl): ValidationErrors|null
+  static minLength(minLength: number): ValidatorFn
+  static maxLength(maxLength: number): ValidatorFn
+  static pattern(pattern: string|RegExp): ValidatorFn
+  static nullValidator(c: AbstractControl): ValidationErrors|null
+  static compose(validators: (ValidatorFn|null|undefined)[]|null): ValidatorFn|null
+  static composeAsync(validators: (AsyncValidatorFn|null)[]): AsyncValidatorFn|null
+}
+            </code></pre>
+            </section>
+            <section>
+                <p>src/app/forbidden-name.directive.ts</p>
+                <pre><code class="hljs javascript" style="font-size:24px; line-height:28px;">
+export function 
+forbiddenNameValidator(nameRe: RegExp): ValidatorFn {
+  return (control: AbstractControl): {[key: string]: any} => {
+    const forbidden = nameRe.test(control.value);
+    return forbidden ? {
+        'forbiddenName': {value: control.value}} : null;
+  };
+}
+            </code></pre>
+            <p><a href="https://angular.io/generated/live-examples/form-validation/eplnkr.html">https://angular.io/generated/live-examples/form-validation/eplnkr.html</a></p>
+            </section>
+            <section>
+                <p>src/app/register.comonent.css</p>
+                <pre><code class="hljs css" style="font-size:24px; line-height:28px;">
+.ng-valid[required], .ng-valid.required  {
+  border-left: 5px solid #42A948; /* green */
+}
+
+.ng-invalid:not(form)  {
+  border-left: 5px solid #a94442; /* red */
+}
+            </code></pre>
+            </section>
+            <section>
+                <p>Template driven</p>
+                <div style="display:flex;">
+                    <div style="width:50%;">
+                        <h3>Za</h3>
+                    </div>
+                    <div style="width:50%;">
+                        <h3>Przeciw</h3>
+                    </div>
+                </div>
+                <div style="display:flex;">
+                    <div style="width:50%;">
+                        <p class="fragment">Prostota</p>
+                        <p class="fragment">Może pisać kto inny niż programista angular</p>
+                    </div>
+                    <div style="width:50%;">
+                        <p class="fragment">Więcej walidatorów, spada czytelność</p>
+                        <p class="fragment">Brak możliwości testowania przez unit testy</p>
+                    </div>
+                </div>
+            </section>
+
+        </section>
+        <section>
+            <section>
+                <h2>Reactive forms</h2>
+            </section>
+            <section>
+                <p>src/app/app.module.ts</p>
+                <pre><code class="hljs javascript" style="font-size:24px; line-height:26px;">
+    import { ReactiveFormsModule } from '@angular/forms';
+    @NgModule({
+        imports: [
+           ...
+           ReactiveFormsModule,
+           ...
+        ],
+        ...
+    })
+    export class AppModule { }
+            </code></pre>
+            </section>
+            <section>
+                <p>src/app/register.component.html</p>
+                <pre><code class="hljs html" style="font-size:24px; line-height:28px;">
+    &lt;form  
+       [formGroup]="registerForm" (submit)="onSubmit()"
+    &gt;
+       &lt;input
+          type="text"
+          formControlName="userLogin"
+       /&gt;
+       &lt;button type="submit"&gt; Register &lt;/button&gt;
+    &lt;/form&gt;
+            </code></pre>
+                <p>src/app/register.component.ts</p>
+                <pre><code class="hljs javascript" style="font-size:24px; line-height:26px;">
+
+    import { FormGroup, FormControl} from '@angular/forms';
+    ...
+    registerForm:FormGroup;
+    ...
+    initForm(){
+        this.registerForm = new FormGroup({
+            userLogin: new FormControl(null)
+        });
+    }
+    ...
+            </code></pre>
+            </section>
+            <section>
+                <p>src/app/register.component.html</p>
+                <pre><code class="hljs html" style="font-size:24px; line-height:28px;">
+    &lt;form  [formGroup]="registerForm" (submit)="onSubmit()"&gt;
+       &lt;input
+          type="text"
+          formControlName="userLogin"
+       /&gt;
+       &lt;button type="submit"&gt; Register &lt;/button&gt;
+    &lt;/form&gt;
+            </code></pre>
+                <p>src/app/register.component.ts</p>
+                <pre><code class="hljs javascript" style="font-size:24px; line-height:26px;">
+    ...
+    initForm(){
+        this.registerForm = new FormGroup({
+            userLogin: new FormControl(null)
+        });
+    }
+    ...
+    onSubmit() {
+        console.log(this.registerForm);
+    }
+            </code></pre>
+            </section>
+            <section>
+                <pre><code class="hljs javascript" style="font-size:20px; line-height:21px;">
+    {
+        controls: {
+            userLogin: {
+                dirty: false,
+                pristine: true,
+                invalid: false
+                valid: true
+                touched: false
+                untouched: true
+            }
+        }
+        value: {
+            userLogin: "to co wpisaliśmy"
+        },
+        dirty: false...
+    }
+            </code></pre>
+            </section>
+            <section>
+                <p>src/app/register.component.html</p>
+                <pre><code class="hljs html" style="font-size:24px; line-height:28px;">
+    &lt;form  [formGroup]="registerForm" (submit)="onSubmit()"&gt;
+       &lt;input type="text"
+          formControlName="userLogin"
+       /&gt;
+       &lt;button type="submit"&gt; Register &lt;/button&gt;
+    &lt;/form&gt;
+            </code></pre>
+                <p>src/app/register.component.ts</p>
+                <pre><code class="hljs javascript" style="font-size:24px; line-height:26px;">
+    import { FormGroup, FormControl, Validators} 
+    from '@angular/forms';
+    ...
+    registerForm:FormGroup;
+    initForm(){
+      this.registerForm = new FormGroup({
+        userLogin: new FormControl('Janusz', [
+          Validators.required,
+          this.properName.bind(this)
+        ])
+      });
+    }
+    ...
+            </code></pre>
+            </section>
+            <section>
+                <p>src/app/register.component.ts</p>
+                <pre><code class="hljs javascript" style="font-size:24px; line-height:26px;">
+  properName(control: FormControl): {[s:string]: boolean}{
+    if (control.value == 'JanuszBiznesu') {
+      return null;
+    } else {
+      return {'properName': true}
+    }
+  }
+            </code></pre>
+            </section>
+            <section>
+                <pre><code class="hljs javascript" style="font-size:20px; line-height:21px;">
+    {
+        controls: {
+            userLogin: {
+                errors: {
+                    properName: true
+                }
+            }
+        }
+        value: {
+            userLogin: "to co wpisaliśmy"
+        },
+        dirty: false...
+    }
+            </code></pre>
+            </section>
+            <section>
+                <p>src/app/register.component.html</p>
+                <pre><code class="hljs html" style="font-size:20px; line-height:21px;">
+&lt;form  [formGroup]="registerForm" (submit)="onSubmit()"&gt;
+  &lt;input type="text" formControlName="userLogin" /&gt;
+  &lt;div
+    *ngIf="
+        registerForm.get('userLogin').errors && 
+        registerForm.get('userLogin').touched"
+  &gt;
+    &lt;span *ngIf="registerForm.get('userLogin').errors.properName"&gt;
+    Prawidłowa nazwa użytkownika to JanuszBiznesu
+    &lt;/span&gt;
+  &lt;/div&gt;
+  &lt;button type="submit"&gt; Register &lt;/button&gt;
+&lt;/form&gt;
+            </code></pre>
+            </section>
+            <section>
+                <p>src/app/register.component.ts</p>
+                <pre><code class="hljs javascript" style="font-size:24px; line-height:26px;">
+    import { FormGroup, FormControl, Validators} 
+    from '@angular/forms';
+    ...
+    registerForm:FormGroup;
+    initForm(){
+      this.registerForm = new FormGroup({
+        adress: new FormGroup({
+            home: new FormControl(null, Validators.required),
+            work: new FormControl(null, Validators.required)
+        })
+      });
+    }
+    ...
+            </code></pre>
+            </section>
+            <section>
+                <p>src/app/register.component.ts</p>
+                <pre><code class="hljs javascript" style="font-size:24px; line-height:26px;">
+    import { FormGroup, FormControl, Validators, FormArray} 
+    from '@angular/forms';
+    initForm(){
+      this.registerForm = new FormGroup({
+        hobby: new FormArray([])
+      });
+    }
+    addHobby(){
+      (&lt;FormArray&gt;registerForm.get('hobby'))
+      .push(
+        new FormControl(null, Validators.required)
+      )
+    }
+            </code></pre>
+            </section>
+            <section>
+                <p>src/app/register.component.ts</p>
+                <pre><code class="hljs javascript" style="font-size:24px; line-height:26px;">
+    initForm(){
+      this.registerForm = new FormGroup({
+        userLogin: new FormControl(null)
+      });
+      this.registerForm.valueChanges.subscribe((value)=>{
+        //{
+        //    userLogin: "to co wpisaliśmy"
+        //}
+      });
+      this.registerForm.statusChanges.subscribe((value)=>{
+        //INVALID i VALID
+      });
+    }
+            </code></pre>
+            </section>
+            <section>
+                <p>src/app/register.component.ts</p>
+                <pre><code class="hljs javascript" style="font-size:24px; line-height:26px;">
+  this.registerForm = new FormGroup({
+    userLogin: new FormControl(null),
+    hobby: new FormArray([]),
+    adress: new FormGroup({
+        home: new FormControl(null, Validators.required),
+        work: new FormControl(null, Validators.required)
+    })
+  });
+  this.registerForm.setValue({
+    'userLogin': "Jan"
+    'hobby': ['szachy'],
+    'addres': {'work':"Warszawa", 'home':"Płock"}
+  });
+            </code></pre>
+            </section>
+            <section>
+                <p>src/app/register.component.ts</p>
+                <pre><code class="hljs javascript" style="font-size:24px; line-height:26px;">
+  this.registerForm = new FormGroup({
+    userLogin: new FormControl(null),
+    hobby: new FormArray([]),
+    adress: new FormGroup({
+        home: new FormControl(null, Validators.required),
+        work: new FormControl(null, Validators.required)
+    })
+  });
+  this.registerForm.patchValue({
+    'userLogin': "Roman"
+  });
+            </code></pre>
+            </section>
+            <section>
+                <p>Reactive Way</p>
+                <div style="display:flex;">
+                    <div style="width:50%;">
+                        <h3>Za</h3>
+                    </div>
+                    <div style="width:50%;">
+                        <h3>Przeciw</h3>
+                    </div>
+                </div>
+                <div style="display:flex;">
+                    <div style="width:50%;">
+                        <p class="fragment">Możliwe unit testy logiki validacji</p>
+                        <p class="fragment">Szablony bez logiki</p>
+                        <p class="fragment">Pełna kontrola nad modelem fomularza</p>
+                    </div>
+                    <div style="width:50%;">
+                        <p class="fragment">Więcej pisania</p>
+                    </div>
+                </div>
+            </section>
+            <section>
+                <p>src/app/register.component.ts</p>
+                <pre><code class="hljs javascript" style="font-size:24px; line-height:26px;">
+  this.registerForm.valueChanges
+        .map((value) => {
+            value.userLogin = value.userLogin.toUpperCase();
+            return value;
+        })
+        .filter((value) => this.form.valid)
+        .subscribe((value) => {
+           console.log("Model Driven Form valid value: vm = ",
+                       JSON.stringify(value));
+        });
+            </code></pre>
+            </section>
+        </section>
+
+        <section>
+            <h2>Dziękuję</h2>
+            <p>Dariusz Biedrzycki</p>
+            <p>kontakt@3wm.pl</p>
+            <p>Mobiem.pl</p>
+        </section>
+    </div>
+
+</div>
+
+<script src="lib/js/head.min.js"></script>
+<script src="js/reveal.min.js"></script>
+
+<script>
+
+    // Full list of configuration options available here:
+    // https://github.com/hakimel/reveal.js#configuration
+    Reveal.initialize({
+        controls: true,
+        progress: true,
+        history: true,
+        center: true,
+
+        theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+        transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/fade/none
+
+        // Parallax scrolling
+        // parallaxBackgroundImage: 'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg',
+        // parallaxBackgroundSize: '2100px 900px',
+
+        // Optional libraries used to extend on reveal.js
+        dependencies: [
+            {
+                src: 'lib/js/classList.js', condition: function () {
+                return !document.body.classList;
+            }
+            },
+            {
+                src: 'plugin/markdown/marked.js', condition: function () {
+                return !!document.querySelector('[data-markdown]');
+            }
+            },
+            {
+                src: 'plugin/markdown/markdown.js', condition: function () {
+                return !!document.querySelector('[data-markdown]');
+            }
+            },
+            {
+                src: 'plugin/highlight/highlight.js', async: true, callback: function () {
+                hljs.initHighlightingOnLoad();
+            }
+            },
+            {
+                src: 'plugin/zoom-js/zoom.js', async: true, condition: function () {
+                return !!document.body.classList;
+            }
+            },
+            {
+                src: 'plugin/notes/notes.js', async: true, condition: function () {
+                return !!document.body.classList;
+            }
+            }
+        ]
+    });
+
+</script>
+<script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35000/livereload.js"></' + 'script>')</script>
+        <script src='http://localhost:35000/socket.io/socket.io.js'></script>
+        <script src='http://localhost:35001/browser-sync-client.min.js'></script>
+</body>
+</html>
